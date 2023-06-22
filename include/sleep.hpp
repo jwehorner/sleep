@@ -14,6 +14,9 @@
  * @date 	2023-06-13
  */
 
+#ifndef SLEEP_HPP
+#define SLEEP_HPP
+
 // C++ Standard Library Headers
 #include <cstdint>
 
@@ -301,3 +304,5 @@ namespace sleep {
 	}
 }
 #endif // _WIN32
+
+#endif /* SLEEP_HPP */
