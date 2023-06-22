@@ -1,0 +1,4 @@
+/*! @mainpage Sleep
+* @section intro Introduction
+* This library provides functions for achieving high resolution sleep durations across multiple platforms. On UNIX systems this is done using ```nanosleep```, however on Windows machines a combination of techniques is used to achieve a tradeoff between resolution and performance.
+*/
