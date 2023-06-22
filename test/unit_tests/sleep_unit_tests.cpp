@@ -34,7 +34,7 @@ std::vector<std::tuple<uint64_t, uint64_t, int64_t>> test_sleep_ms(uint32_t dura
 	return start_end_times;
 }
 
-std::vector<std::tuple<uint64_t, uint64_t, int64_t>> test_sleep_ms_corrected(uint32_t duration_ms, uint32_t sample_count) {
+std::vector<std::tuple<uint64_t, uint64_t, int64_t>> test_sleep_ms_corrected(uint32_t duration_ms, uint32_t sample_count, uint64_t task_duration_us = 0) {
 	std::vector<std::tuple<uint64_t, uint64_t, int64_t>> start_end_times{};
 	int64_t error_us = 0;
 	for (int i = 0; i < sample_count; i++) {
@@ -42,6 +42,7 @@ std::vector<std::tuple<uint64_t, uint64_t, int64_t>> test_sleep_ms_corrected(uin
 		uint64_t start_us;
 		start_ns = sleep::now_ns();
 		start_us = sleep::now_us();
+		sleep::sleep_us(task_duration_us);
 		sleep::sleep_ms_corrected(duration_ms, error_us);
 		error_us += ((int64_t)sleep::now_us() - (int64_t)start_us) - (duration_ms * 1'000);
 		end_ns = sleep::now_ns();
@@ -228,6 +229,60 @@ TEST_CASE("Checking sleep_ms_corrected with sleep duration of 2 milliseconds.", 
 TEST_CASE("Checking sleep_ms_corrected with sleep duration of 1 milliseconds.", "[sleep_ms_corrected][test][short]") {
 	uint32_t ms = 1;
 	REQUIRE_NOTHROW(save_results(test_sleep_ms_corrected(ms, 1 * (1000 / ms)), PROJECT_DIRECTORY + RESULTS_DIR + "sleep_ms_corrected-" + std::to_string(ms) + "ms.csv"));
+}
+
+
+/*************************************************************************************************/
+/* sleep_ms_corrected with 1 millisecond Task Duration Tests									 */
+/*************************************************************************************************/
+TEST_CASE("Checking sleep_ms_corrected with sleep duration of 1 second and task duration of 1 millisecond.", "[sleep_ms_corrected-task][test][long]") {
+	uint32_t ms = 1000;
+	REQUIRE_NOTHROW(save_results(test_sleep_ms_corrected(ms, 10 * (1000 / ms), 1'000), PROJECT_DIRECTORY + RESULTS_DIR + "sleep_ms_corrected-task-" + std::to_string(ms) + "ms.csv"));
+}
+
+TEST_CASE("Checking sleep_ms_corrected with sleep duration of 500 milliseconds and task duration of 1 millisecond.", "[sleep_ms_corrected-task][test][long]") {
+	uint32_t ms = 500;
+	REQUIRE_NOTHROW(save_results(test_sleep_ms_corrected(ms, 10 * (1000 / ms), 1'000), PROJECT_DIRECTORY + RESULTS_DIR + "sleep_ms_corrected-task-" + std::to_string(ms) + "ms.csv"));
+}
+
+TEST_CASE("Checking sleep_ms_corrected with sleep duration of 250 milliseconds and task duration of 1 millisecond.", "[sleep_ms_corrected-task][test][long]") {
+	uint32_t ms = 250;
+	REQUIRE_NOTHROW(save_results(test_sleep_ms_corrected(ms, 10 * (1000 / ms), 1'000), PROJECT_DIRECTORY + RESULTS_DIR + "sleep_ms_corrected-task-" + std::to_string(ms) + "ms.csv"));
+}
+
+TEST_CASE("Checking sleep_ms_corrected with sleep duration of 50 milliseconds and task duration of 1 millisecond.", "[sleep_ms_corrected-task][test][short]") {
+	uint32_t ms = 50;
+	REQUIRE_NOTHROW(save_results(test_sleep_ms_corrected(ms, 5 * (1000 / ms), 1'000), PROJECT_DIRECTORY + RESULTS_DIR + "sleep_ms_corrected-task-" + std::to_string(ms) + "ms.csv"));
+}
+
+TEST_CASE("Checking sleep_ms_corrected with sleep duration of 10 milliseconds and task duration of 1 millisecond.", "[sleep_ms_corrected-task][test][short]") {
+	uint32_t ms = 10;
+	REQUIRE_NOTHROW(save_results(test_sleep_ms_corrected(ms, 1 * (1000 / ms), 1'000), PROJECT_DIRECTORY + RESULTS_DIR + "sleep_ms_corrected-task-" + std::to_string(ms) + "ms.csv"));
+}
+
+TEST_CASE("Checking sleep_ms_corrected with sleep duration of 5 milliseconds and task duration of 1 millisecond.", "[sleep_ms_corrected-task][test][short]") {
+	uint32_t ms = 5;
+	REQUIRE_NOTHROW(save_results(test_sleep_ms_corrected(ms, 1 * (1000 / ms), 1'000), PROJECT_DIRECTORY + RESULTS_DIR + "sleep_ms_corrected-task-" + std::to_string(ms) + "ms.csv"));
+}
+
+TEST_CASE("Checking sleep_ms_corrected with sleep duration of 4 milliseconds and task duration of 1 millisecond.", "[sleep_ms_corrected-task][test][short]") {
+	uint32_t ms = 4;
+	REQUIRE_NOTHROW(save_results(test_sleep_ms_corrected(ms, 1 * (1000 / ms), 1'000), PROJECT_DIRECTORY + RESULTS_DIR + "sleep_ms_corrected-task-" + std::to_string(ms) + "ms.csv"));
+}
+
+TEST_CASE("Checking sleep_ms_corrected with sleep duration of 3 milliseconds and task duration of 1 millisecond.", "[sleep_ms_corrected-task][test][short]") {
+	uint32_t ms = 3;
+	REQUIRE_NOTHROW(save_results(test_sleep_ms_corrected(ms, 1 * (1000 / ms), 1'000), PROJECT_DIRECTORY + RESULTS_DIR + "sleep_ms_corrected-task-" + std::to_string(ms) + "ms.csv"));
+}
+
+TEST_CASE("Checking sleep_ms_corrected with sleep duration of 2 milliseconds and task duration of 1 millisecond.", "[sleep_ms_corrected-task][test][short]") {
+	uint32_t ms = 2;
+	REQUIRE_NOTHROW(save_results(test_sleep_ms_corrected(ms, 1 * (1000 / ms), 1'000), PROJECT_DIRECTORY + RESULTS_DIR + "sleep_ms_corrected-task-" + std::to_string(ms) + "ms.csv"));
+}
+
+TEST_CASE("Checking sleep_ms_corrected with sleep duration of 1 milliseconds and task duration of 1 millisecond.", "[sleep_ms_corrected-task][test][short]") {
+	uint32_t ms = 1;
+	REQUIRE_NOTHROW(save_results(test_sleep_ms_corrected(ms, 1 * (1000 / ms), 1'000), PROJECT_DIRECTORY + RESULTS_DIR + "sleep_ms_corrected-task-" + std::to_string(ms) + "ms.csv"));
 }
 
 

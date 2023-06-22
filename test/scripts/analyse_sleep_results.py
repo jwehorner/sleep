@@ -57,7 +57,7 @@ if __name__ == '__main__':
 		]
 
 		if args.accumulate:
-			df.to_excel(writer, sheet_name=r['name'], index=False)
+			df.to_excel(writer, sheet_name=r['name'].split('.')[0], index=False)
 
 	if args.accumulate:
 		writer.close()
