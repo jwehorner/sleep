@@ -1,6 +1,6 @@
 /**
- * @file 	sleep.hpp
- * @brief 	sleep.hpp defines a number of cross-platform utility functions for sleeping for 
+ * @file 	high_resolution_sleep.hpp
+ * @brief 	high_resolution_sleep.hpp defines a number of cross-platform utility functions for sleeping for 
  * 			millisecond and microsecond durations.
  * @details	The file provides cross platform implementations for sleeping for millisecond 
  * 			and microsecond durations, as well as querying the current time in microseconds.
@@ -36,7 +36,7 @@
 #endif /* _WIN32 */
 
 
-namespace sleep {
+namespace high_resolution_sleep {
 	/**************************************************************************************************/
 	/* UNIX Implementations			 																  */
 	/**************************************************************************************************/
@@ -65,8 +65,35 @@ namespace sleep {
 		while (nanosleep(&ts, &ts) == -1 && errno == EINTR);
 	}
 
+	/**
+	 * 	@brief		Function sleep_ms_corrected sleeps for the specified number of milliseconds minus
+	 * 				the provided schedule slip, so that the mean sleep time converges onto the desired period. 
+	 *	@param		ms			uint32_t number of milliseconds to sleep for.
+	 *	@param		error_us 	int64_t number of microseconds of error accumulated by sleeping.
+	 *	@details	This function is intended to be used in the included kind of error tracking pattern,
+	 *				where the schedule slip is tracked with each iteration, so when the slip gets too large
+	 *				a sleep is skipped and the schedule catches back up.
+	 *	@code 		{.cpp}
+	 *				int64_t start_time_us, error_us = 0;
+	 *				uint32_t duration_ms = 1;
+	 *				while(CONDITION) {
+	 *					start_time_us = sleep::now_us();
+	 *					sleep::sleep_ms_corrected(duration_ms, error_us);
+	 *					error_us += ((int64_t)sleep::now_us() - start_time_us) - (duration_ms * 1'000);
+	 *				}
+	 * 	@endcode
+	 */
+	const void sleep_ms_corrected(const uint32_t ms, const int64_t error_us) {
+		// If the error is greater than or equal to the requested sleep duration, skip the sleep.
+		int32_t adjusted_sleep_ms = ms - (error_us / 1'000);
+		if (adjusted_sleep_ms > 0) {
+			sleep_ms(adjusted_sleep_ms);
+		}
+		return;
+	}
+
 	/**************************************************************************************************/
-	/* Apple Implementations			 															  */
+	/* Regular UNIX Implementations		 															  */
 	/**************************************************************************************************/
 	#ifndef __APPLE__
 	/**
@@ -89,7 +116,7 @@ namespace sleep {
 		return static_cast<uint64_t>(now.tv_sec) * 1'000'000'000 + now.tv_nsec;
 	}
 
-	#else /* Regular UNIX */
+	#else /* APPLE */
 	/**
 	 * @brief	Function now_us gets the current system time in microseconds.
 	 * @return	uint64_t current system time in microseconds.
@@ -302,7 +329,7 @@ namespace sleep {
 			remaining_count = end_counter - GetPerfCounter();
 		}
 	}
-}
 #endif // _WIN32
+}
 
 #endif /* SLEEP_HPP */

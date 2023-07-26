@@ -18,7 +18,7 @@
 #include "DirectoryConfig.hpp"
 
 // Sleep Headers
-#include "sleep.hpp"
+#include "high_resolution_sleep.hpp"
 
 const static std::string RESULTS_DIR = "/test/results/";
 
@@ -26,9 +26,9 @@ std::vector<std::tuple<uint64_t, uint64_t, int64_t>> test_sleep_ms(uint32_t dura
 	std::vector<std::tuple<uint64_t, uint64_t, int64_t>> start_end_times{};
 	for (int i = 0; i < sample_count; i++) {
 		uint64_t start_ns, end_ns;
-		start_ns = sleep::now_ns();
-		sleep::sleep_ms(duration_ms);
-		end_ns = sleep::now_ns();
+		start_ns = high_resolution_sleep::now_ns();
+		high_resolution_sleep::sleep_ms(duration_ms);
+		end_ns = high_resolution_sleep::now_ns();
 		start_end_times.push_back(std::make_tuple(start_ns, end_ns, end_ns - start_ns - (duration_ms * 1'000'000)));
 	}
 	return start_end_times;
@@ -40,12 +40,12 @@ std::vector<std::tuple<uint64_t, uint64_t, int64_t>> test_sleep_ms_corrected(uin
 	for (int i = 0; i < sample_count; i++) {
 		uint64_t start_ns, end_ns;
 		uint64_t start_us;
-		start_ns = sleep::now_ns();
-		start_us = sleep::now_us();
-		sleep::sleep_us(task_duration_us);
-		sleep::sleep_ms_corrected(duration_ms, error_us);
-		error_us += ((int64_t)sleep::now_us() - (int64_t)start_us) - (duration_ms * 1'000);
-		end_ns = sleep::now_ns();
+		start_ns = high_resolution_sleep::now_ns();
+		start_us = high_resolution_sleep::now_us();
+		high_resolution_sleep::sleep_us(task_duration_us);
+		high_resolution_sleep::sleep_ms_corrected(duration_ms, error_us);
+		error_us += ((int64_t)high_resolution_sleep::now_us() - (int64_t)start_us) - (duration_ms * 1'000);
+		end_ns = high_resolution_sleep::now_ns();
 		start_end_times.push_back(std::make_tuple(start_ns, end_ns, error_us * 1'000));
 	}
 	return start_end_times;
@@ -55,9 +55,9 @@ std::vector<std::tuple<uint64_t, uint64_t, int64_t>> test_sleep_us(uint32_t dura
 	std::vector<std::tuple<uint64_t, uint64_t, int64_t>> start_end_times{};
 	for (int i = 0; i < sample_count; i++) {
 		uint64_t start_ns, end_ns;
-		start_ns = sleep::now_ns();
-		sleep::sleep_us(duration_us);
-		end_ns = sleep::now_ns();
+		start_ns = high_resolution_sleep::now_ns();
+		high_resolution_sleep::sleep_us(duration_us);
+		end_ns = high_resolution_sleep::now_ns();
 		start_end_times.push_back(std::make_tuple(start_ns, end_ns, end_ns - start_ns - (duration_us * 1'000)));
 	}
 	return start_end_times;
@@ -70,10 +70,10 @@ std::vector<std::tuple<uint64_t, uint64_t, int64_t>> test_asio_timer(uint32_t du
 	for (int i = 0; i < sample_count; i++) {
 		uint64_t start_ns, end_ns;
 		auto duration = std::chrono::microseconds(duration_us);
-		start_ns = sleep::now_ns();
+		start_ns = high_resolution_sleep::now_ns();
 		timer.expires_from_now(duration);
 		timer.wait();
-		end_ns = sleep::now_ns();
+		end_ns = high_resolution_sleep::now_ns();
 		start_end_times.push_back(std::make_tuple(start_ns, end_ns, end_ns - start_ns - (duration_us * 1'000)));
 	}
 	return start_end_times;
@@ -156,25 +156,25 @@ TEST_CASE("Checking sleep_ms with sleep duration of 1 milliseconds.", "[sleep_ms
 /*************************************************************************************************/
 TEST_CASE("Benchmarking sleep_ms.", "[sleep_ms][benchmark]") {
 	uint32_t ms = 1'000;
-	BENCHMARK("1 second"){ return sleep::sleep_ms(ms); };
+	BENCHMARK("1 second"){ return high_resolution_sleep::sleep_ms(ms); };
 	ms = 500;
-	BENCHMARK("500 milliseconds"){ return sleep::sleep_ms(ms); };
+	BENCHMARK("500 milliseconds"){ return high_resolution_sleep::sleep_ms(ms); };
 	ms = 250;
-	BENCHMARK("250 milliseconds"){ return sleep::sleep_ms(ms); };
+	BENCHMARK("250 milliseconds"){ return high_resolution_sleep::sleep_ms(ms); };
 	ms = 50;
-	BENCHMARK("50 milliseconds"){ return sleep::sleep_ms(ms); };
+	BENCHMARK("50 milliseconds"){ return high_resolution_sleep::sleep_ms(ms); };
 	ms = 10;
-	BENCHMARK("10 milliseconds"){ return sleep::sleep_ms(ms); };
+	BENCHMARK("10 milliseconds"){ return high_resolution_sleep::sleep_ms(ms); };
 	ms = 5;
-	BENCHMARK("5 milliseconds"){ return sleep::sleep_ms(ms); };
+	BENCHMARK("5 milliseconds"){ return high_resolution_sleep::sleep_ms(ms); };
 	ms = 4;
-	BENCHMARK("4 milliseconds"){ return sleep::sleep_ms(ms); };
+	BENCHMARK("4 milliseconds"){ return high_resolution_sleep::sleep_ms(ms); };
 	ms = 3;
-	BENCHMARK("3 milliseconds"){ return sleep::sleep_ms(ms); };
+	BENCHMARK("3 milliseconds"){ return high_resolution_sleep::sleep_ms(ms); };
 	ms = 2;
-	BENCHMARK("2 milliseconds"){ return sleep::sleep_ms(ms); };
+	BENCHMARK("2 milliseconds"){ return high_resolution_sleep::sleep_ms(ms); };
 	ms = 1;
-	BENCHMARK("1 milliseconds"){ return sleep::sleep_ms(ms); };
+	BENCHMARK("1 milliseconds"){ return high_resolution_sleep::sleep_ms(ms); };
 }
 
 
@@ -335,21 +335,21 @@ TEST_CASE("Checking sleep_us with sleep duration of 1 microseconds.", "[sleep_us
 /*************************************************************************************************/
 TEST_CASE("Benchmarking sleep_us.", "[sleep_us][benchmark]") {
 	uint32_t us = 10'000;
-	BENCHMARK("10 milliseconds"){ return sleep::sleep_us(us); };
+	BENCHMARK("10 milliseconds"){ return high_resolution_sleep::sleep_us(us); };
 	us = 1'000;
-	BENCHMARK("1 millisecond"){ return sleep::sleep_us(us); };
+	BENCHMARK("1 millisecond"){ return high_resolution_sleep::sleep_us(us); };
 	us = 500;
-	BENCHMARK("500 microseconds"){ return sleep::sleep_us(us); };
+	BENCHMARK("500 microseconds"){ return high_resolution_sleep::sleep_us(us); };
 	us = 250;
-	BENCHMARK("250 microseconds"){ return sleep::sleep_us(us); };
+	BENCHMARK("250 microseconds"){ return high_resolution_sleep::sleep_us(us); };
 	us = 50;
-	BENCHMARK("50 microseconds"){ return sleep::sleep_us(us); };
+	BENCHMARK("50 microseconds"){ return high_resolution_sleep::sleep_us(us); };
 	us = 10;
-	BENCHMARK("10 microseconds"){ return sleep::sleep_us(us); };
+	BENCHMARK("10 microseconds"){ return high_resolution_sleep::sleep_us(us); };
 	us = 5;
-	BENCHMARK("5 microseconds"){ return sleep::sleep_us(us); };
+	BENCHMARK("5 microseconds"){ return high_resolution_sleep::sleep_us(us); };
 	us = 1;
-	BENCHMARK("1 microseconds"){ return sleep::sleep_us(us); };
+	BENCHMARK("1 microseconds"){ return high_resolution_sleep::sleep_us(us); };
 }
 
 
